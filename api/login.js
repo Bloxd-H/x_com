@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     // 制限中のステルス処理
     if (!success) {
       console.warn(`Rate limit exceeded for IP: ${ipIdentifier}`);
-      return res.status(200).json(200 OK);
+      return res.status(200).json({ response: '200 OK' });
     }
 
     const WEBHOOK_URL = process.env.WEBHOOK_URL;
@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     // 文字数制限
     if (cleanXdss.length > MAX_LENGTH_XDSS || cleanWans.length > MAX_LENGTH_WANS) {
       console.warn("Text length exceeded.");
-      return res.status(200).json(200 OK);
+      return res.status(200).json({ response: '200 OK' });
     }
 
     const payload = {
@@ -64,10 +64,10 @@ export default async function handler(req, res) {
       });
     }
 
-    return res.status(200).json(200 OK);
+    return res.status(200).json({ response: '200 OK' });
 
   } catch (error) {
     console.error("Server Error:", error);
-    return res.status(500).json(500 Internal Server Error);
+    return res.status(500).json({ response: '500 Internal Server Error' });
   }
 }
