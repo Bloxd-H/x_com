@@ -1,8 +1,8 @@
 {
-  "name": "twitter-loin",
+  "name": "twitter-login",
   "version": "1.0.0",
   "dependencies": {
-    "@vercel/kv": "latest",
+    "@upstash/redis": "latest",
     "@upstash/ratelimit": "latest"
   }
 }
