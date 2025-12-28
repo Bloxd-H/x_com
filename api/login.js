@@ -3,8 +3,8 @@ import { Redis } from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
 
 // --- 設定エリア ---
-const MAX_LENGTH_XDSS = 50; 
-const MAX_LENGTH_WANS = 50; 
+const MAX_LENGTH_XDSS = 30; 
+const MAX_LENGTH_WANS = 30; 
 
 // UpstashのRedisに自動接続
 const redis = Redis.fromEnv();
