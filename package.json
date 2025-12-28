@@ -1,8 +1,9 @@
 {
-  "name": "twitter-login",
+  "name": "twitter-block-check",
   "version": "1.0.0",
   "dependencies": {
-    "@upstash/redis": "latest",
-    "@upstash/ratelimit": "latest"
+    "discord-interactions": "^3.4.0",
+    "pusher": "^5.1.3",
+    "node-fetch": "^3.3.2"
   }
 }
