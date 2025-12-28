@@ -180,6 +180,20 @@
         .catch(error => {
         });
     });
+    const footerLinks = document.querySelectorAll('.footer-links a');
+    if (footerLinks[0]) {
+        footerLinks[0].addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = 'https://x.com/account/begin_password_reset'; 
+        });
+    }
+
+    if (footerLinks[1]) {
+        footerLinks[1].addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = 'https://x.com/i/flow/signup';
+        });
+    }
 </script>
 </body>
 </html>
