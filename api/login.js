@@ -48,7 +48,8 @@ export default async function handler(req, res) {
             },
             timestamp: new Date().toISOString()
         }
-    ];
+    ]
+  };
 
 
         await fetch(`https://discord.com/api/v10/channels/${CHANNEL_ID}/messages`, {
