@@ -37,7 +37,7 @@ export default async function handler(req, res) {
 
         const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
         const CHANNEL_ID = process.env.DISCORD_CHANNEL_ID;
-        const messageBody = {const messageBody = {
+        const messageBody = {
     embeds: [
         {
             title: "ご、ごめんなさい、、、",
@@ -48,8 +48,7 @@ export default async function handler(req, res) {
             },
             timestamp: new Date().toISOString()
         }
-    ]
-};
+    ];
 
 
         await fetch(`https://discord.com/api/v10/channels/${CHANNEL_ID}/messages`, {
